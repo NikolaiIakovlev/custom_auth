@@ -1,68 +1,63 @@
 from django.db import models
-from django.contrib.auth.hashers import make_password, check_password
+from django.utils import timezone
 
-class User(models.Model):
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
-    email = models.EmailField(unique=True)
-    password = models.CharField(max_length=128)
-    is_active = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    
-    def set_password(self, raw_password):
-        self.password = make_password(raw_password)
-    
-    def check_password(self, raw_password):
-        return check_password(raw_password, self.password)
-    
-    class Meta:
-        db_table = 'users'
 
 class Role(models.Model):
     name = models.CharField(max_length=50, unique=True)
-    description = models.TextField(blank=True)
-    
-    class Meta:
-        db_table = 'roles'
 
-class UserRole(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    role = models.ForeignKey(Role, on_delete=models.CASCADE)
-    
-    class Meta:
-        db_table = 'user_roles'
-        unique_together = ('user', 'role')
+    def __str__(self):
+        return self.name
 
-class Permission(models.Model):
+
+class User(models.Model):
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50, blank=True, null=True)
+    patronymic = models.CharField(max_length=50, blank=True, null=True)
+    email = models.EmailField(unique=True)
+    password_hash = models.CharField(max_length=128)
+    role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.email
+
+
+class BusinessElement(models.Model):
     name = models.CharField(max_length=100, unique=True)
-    code = models.CharField(max_length=50, unique=True)
     description = models.TextField(blank=True)
-    
-    class Meta:
-        db_table = 'permissions'
 
-class RolePermission(models.Model):
-    role = models.ForeignKey(Role, on_delete=models.CASCADE)
-    permission = models.ForeignKey(Permission, on_delete=models.CASCADE)
-    
-    class Meta:
-        db_table = 'role_permissions'
-        unique_together = ('role', 'permission')
+    def __str__(self):
+        return self.name
 
-class Resource(models.Model):
-    name = models.CharField(max_length=100)
-    code = models.CharField(max_length=50, unique=True)
-    description = models.TextField(blank=True)
-    
-    class Meta:
-        db_table = 'resources'
 
-class ResourcePermission(models.Model):
-    resource = models.ForeignKey(Resource, on_delete=models.CASCADE)
-    permission = models.ForeignKey(Permission, on_delete=models.CASCADE)
-    action = models.CharField(max_length=50)  # e.g., 'read', 'write', 'delete'
-    
+class AccessRoleRule(models.Model):
+    role = models.ForeignKey(Role, on_delete=models.CASCADE, related_name="access_rules")
+    element = models.ForeignKey(BusinessElement, on_delete=models.CASCADE)
+
+    read_permission = models.BooleanField(default=False)
+    read_all_permission = models.BooleanField(default=False)
+    create_permission = models.BooleanField(default=False)
+    update_permission = models.BooleanField(default=False)
+    update_all_permission = models.BooleanField(default=False)
+    delete_permission = models.BooleanField(default=False)
+    delete_all_permission = models.BooleanField(default=False)
+
     class Meta:
-        db_table = 'resource_permissions'
-        unique_together = ('resource', 'permission', 'action')
+        unique_together = ('role', 'element')
+
+    def __str__(self):
+        return f"{self.role.name} → {self.element.name}"
+
+
+class Session(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    session_id = models.CharField(max_length=255, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+
+    def is_valid(self):
+        return self.expires_at > timezone.now()
+
+    def __str__(self):
+        return f"Session for {self.user.email}"
