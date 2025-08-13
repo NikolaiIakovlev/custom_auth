@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Удаление аккаунта</title>
+</head>
+<body>
+    <h2>Вы уверены, что хотите удалить аккаунт?</h2>
+    <form method="post" action="/api/delete-account/">
+        {% csrf_token %}
+        <button type="submit">Удалить аккаунт</button>
+    </form>
+</body>
+</html>

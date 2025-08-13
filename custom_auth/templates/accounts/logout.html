@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Выход</title>
+</head>
+<body>
+    <h2>Выход из аккаунта</h2>
+    <form method="post" action="/api/logout/">
+        {% csrf_token %}
+        <button type="submit">Выйти</button>
+    </form>
+</body>
+</html>

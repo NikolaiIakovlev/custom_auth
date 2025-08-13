@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Обновление профиля</title>
+</head>
+<body>
+    <h2>Обновление профиля</h2>
+    <form method="post" action="/api/update-profile/">
+        {% csrf_token %}
+        <label>Имя:</label><br>
+        <input type="text" name="first_name"><br><br>
+
+        <label>Фамилия:</label><br>
+        <input type="text" name="last_name"><br><br>
+
+        <label>Новый пароль:</label><br>
+        <input type="password" name="password"><br><br>
+
+        <label>Повтор пароля:</label><br>
+        <input type="password" name="password_repeat"><br><br>
+
+        <button type="submit">Обновить</button>
+    </form>
+</body>
+</html>

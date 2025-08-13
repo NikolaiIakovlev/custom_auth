@@ -40,20 +40,30 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    #'accounts.middleware.AuthenticationMiddleware',
 ]
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [],
     'DEFAULT_PERMISSION_CLASSES': [],
 }
+# JWT Настройки
+JWT_CONFIG = {
+    'SECRET_KEY': 'cnhjljdhsnvjsysla_fd*nflsuynf4k21',  # Минимум 32 символа
+    'ALGORITHM': 'HS256',  # Алгоритм подписи (HS256 или RS256)
+    'ACCESS_TOKEN_LIFETIME_HOURS': 24,  # Время жизни access токена
+    'REFRESH_TOKEN_LIFETIME_DAYS': 30,  # Время жизни refresh токена
+    'AUTH_HEADER_TYPES': ('Bearer',),  # Тип заголовка для авторизации
+}
+
+# Настройки сессии
+SESSION_COOKIE_AGE = 86400  # Время жизни сессии в секундах (24 часа)
 
 ROOT_URLCONF = 'custom_auth.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / "templates"], 
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -67,7 +77,10 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'custom_auth.wsgi.application'
-
+# Настройки админки
+ADMIN_SITE_HEADER = "Custom Auth Administration"
+ADMIN_SITE_TITLE = "Custom Auth Admin"
+ADMIN_INDEX_TITLE = "Welcome to Custom Auth Portal"
 # Настройки JWT
 JWT_SECRET_KEY = SECRET_KEY
 JWT_ALGORITHM = 'HS256'
@@ -107,7 +120,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'Ru-ru'
 
-TIME_ZONE = 'Moscow'
+TIME_ZONE = 'Europe/Moscow'
 
 USE_I18N = True
 
